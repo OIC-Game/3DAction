@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     private Transform _transform;
     private Vector3 _moveVelocity;
 
-    [SerializeField] private Animator animator;
+    //[SerializeField] private Animator animator;
 
 
     // Start is called before the first frame update
@@ -46,6 +46,6 @@ public class PlayerController : MonoBehaviour
 
         _characterController.Move(_moveVelocity * Time.deltaTime);
 
-        animator.SetFloat("MoveSpeed", new Vector3(_moveVelocity.x, 0, _moveVelocity.z).magnitude);
+        //animator.SetFloat("MoveSpeed", new Vector3(_moveVelocity.x, 0, _moveVelocity.z).magnitude);
     }
 }
