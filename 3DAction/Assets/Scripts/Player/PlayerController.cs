@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Action3D.InputProvider;
+using Action3D.Stage;
 
 namespace Action3D.Player
 {
@@ -16,13 +17,15 @@ namespace Action3D.Player
 
         //ステージが長くなりすぎた場合スクロールできるようにするため
         private StageManager stageManager;
-        private bool isStageScroll = false;
+        [SerializeField] private bool isStageScroll = false;
+
+        private bool autoMove;
 
         [SerializeField] private float fowardSpeed = 15.0f;
         [SerializeField] private float lateralSpeed = 3.0f;
 
         private bool isLaneChenge = false;
-        private int currentLane = 0;
+        [SerializeField] private int currentLane = 0;
         private float[] laneCenterPosArray = new float[]{ frontLane, backLane };
 
         //テスト用レーンの座標定数
@@ -54,6 +57,12 @@ namespace Action3D.Player
 
         void Update()
         {
+            //自動移動フラグ
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                autoMove = !autoMove;
+            }
+
             //スライディング処理(要CT)
             if (input.GetSliding() && slidingTime == 0)
             {
@@ -101,11 +110,14 @@ namespace Action3D.Player
 
             moveValue.x += input.GetLateralAxis() * lateralSpeed;
 
-            if (input.GetForwardMove())
+            if (input.GetForwardMove() || autoMove)
             {
                 if (isStageScroll)
                 {
-                    //未実装
+                    float scroll = fowardSpeed;
+                    if (isSliding)
+                        scroll += 5; 
+                    stageManager.StageScroll(scroll * Time.deltaTime);
                 }
                 else
                 {
@@ -136,6 +148,7 @@ namespace Action3D.Player
 
         void Jump()
         {
+            isJumped = true;
             rigidbody.velocity = new Vector3(rigidbody.velocity.x, 10, rigidbody.velocity.z);
         }
 
