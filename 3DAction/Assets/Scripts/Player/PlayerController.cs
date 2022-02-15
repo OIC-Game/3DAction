@@ -33,6 +33,10 @@ namespace Action3D.Player
         private bool isGrounded = false;
         private bool isJumped = false;
 
+        private bool isSliding = false;
+        private float slidingTime = 0;
+        private const float slidingDefaultTime = 1;
+
         public void SetInputProvider(IInputProvider input)
         {
             this.input = input;
@@ -50,9 +54,25 @@ namespace Action3D.Player
 
         void Update()
         {
-            //移動処理
-            GroundCheck();
+            //スライディング処理(要CT)
+            if (input.GetSliding() && slidingTime == 0)
+            {
+                isSliding = true;
+                slidingTime = slidingDefaultTime;
+            }
+            if (isSliding)
+            {
+                slidingTime -= Time.deltaTime;
+                if (slidingTime <= 0)
+                {
+                    slidingTime = 0;
+                    isSliding = false;
+                }
+            }
 
+            //接地確認
+            GroundCheck();
+            //ジャンプ処理、レーン変更呼び出し
             if (input.GetJump())
             {
                 if (isGrounded && !isJumped)
@@ -71,6 +91,7 @@ namespace Action3D.Player
 
         void FixedUpdate()
         {
+            //移動処理
             Move();
         }
 
@@ -89,6 +110,10 @@ namespace Action3D.Player
                 else
                 {
                     moveValue.z += fowardSpeed;
+                    if (isSliding)
+                    {
+                        moveValue.z += 5;
+                    }
                 }
             }
 
